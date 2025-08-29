@@ -15,7 +15,6 @@ Ce dépôt fournit un script shell à exécuter sur un nœud Proxmox pour créer
 - Une clé SSH publique si vous souhaitez un accès SSH sans mot de passe dans la VM
 
 ## One-liner d'installation
-Remplacez `YOUR_REPO_RAW_URL` par l'URL RAW de ce dépôt (branche principale) une fois poussé sur GitHub.
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swiss/main/setup-omv-on-proxmox.sh)" -- \
