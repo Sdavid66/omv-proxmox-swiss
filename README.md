@@ -15,19 +15,15 @@ Ce dépôt fournit un script shell à exécuter sur un nœud Proxmox pour créer
 - Une clé SSH publique si vous souhaitez un accès SSH sans mot de passe dans la VM
 
 ## One-liner d'installation
-
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swiss/main/setup-omv-on-proxmox.sh)" -- \
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swiss/main/setup-omv-on-proxmox-v2.sh)" -- \
   --name omv \
   --memory 4096 \
   --cores 2 \
   --disk 32G \
   --bridge vmbr0 \
   --storage local-lvm \
-  --ssh-key "$(cat ~/.ssh/id_rsa.pub)" \
-  --data-disk 1T \
-  --data-disk 2T \
-  --data-storage local-lvm
+  --ssh-key "$(cat ~/.ssh/id_rsa.pub)"
 ```
 
 Paramètres disponibles (tous optionnels):
@@ -39,29 +35,35 @@ Paramètres disponibles (tous optionnels):
 - `--storage` Stockage pour le disque (défaut: `local-lvm`)
 - `--ssh-key` Clé publique SSH à injecter pour l'utilisateur `omvadmin`
 - `--timezone` Fuseau horaire (défaut: `Europe/Zurich`)
-- `--data-disk` Taille d'un disque de données à ajouter (répétable, ex: `--data-disk 1T --data-disk 500G`)
-- `--data-storage` Stockage où créer les disques de données (défaut: même valeur que `--storage`)
+- `--with-cloudinit` Force Cloud-Init (par défaut déjà activé)
+- `--no-cloudinit` Désactive Cloud-Init et l'installation auto dans la VM
 
 Paramètres régionaux par défaut dans la VM:
 - Fuseau horaire: Europe/Zurich
 - Langue: fr_CH.UTF-8
 - Clavier: Suisse (français) — layout `ch`, variant `fr`
 
-Le script va:
+Le script va (par défaut avec Cloud-Init):
 1. Télécharger l'image Debian 12 Generic Cloud si absente
 2. Créer un VMID libre automatiquement
 3. Créer la VM et y importer le disque
-4. Créer et attacher des disques de données supplémentaires si demandés (SCSI, `ssd=1`, `discard=on`)
-5. Configurer Cloud-Init et injecter un user-data personnalisé
-6. Démarrer la VM et afficher son VMID (et si possible son IP via qemu-guest-agent)
+4. Ajouter le lecteur Cloud-Init, injecter un user-data, configurer DHCP
+5. Démarrer la VM et afficher son VMID (et si possible son IP via qemu-guest-agent)
 
 Une fois la VM démarrée, accédez à l'interface OMV via HTTP sur l'IP de la VM (port 80). Les identifiants par défaut OMV sont définis par OMV lors de l'installation (admin / mot de passe demandé par OMV). Le plugin de chiffrement LUKS sera présent dans l'UI (vous pourrez ensuite chiffrer/configurer vos disques via l'interface OMV).
+
+## Modes d'installation
+- **Avec Cloud-Init (par défaut)**: ajoute un lecteur Cloud-Init, injecte un `user-data` avec utilisateur `omvadmin`, configure DHCP et lance l'installation automatique d'OMV (ainsi que `qemu-guest-agent` et le plugin LUKS).
+- **Sans Cloud-Init (`--no-cloudinit`)**: la VM est créée et démarrée, mais aucune configuration/installation dans l'OS invité n'est effectuée automatiquement. Vous pouvez installer OMV manuellement.
 
 ## Notes
 - Le script active et installe `qemu-guest-agent` dans la VM pour permettre à Proxmox de récupérer l'IP.
 - Si vous ne fournissez pas `--ssh-key`, le compte `omvadmin` sera créé avec un mot de passe par défaut faible (affiché par le script). Changez-le immédiatement.
 - Vous pouvez ajuster l'URL de l'image Debian ou les options hardware dans le script selon vos besoins.
-- Les disques de données sont attachés en SCSI avec `ssd=1` et `discard=on` (utile pour trim sur SSD/LVM-thin). Ils apparaîtront dans l'UI d'OMV pour être chiffrés et montés.
+- Pour ajouter des disques de données, créez-les depuis Proxmox (qm set --scsiX <storage>:<size>) ou via l'UI de Proxmox, puis chiffrez-les et montez-les dans OMV.
+
+## Sortie colorée
+Le script affiche les étapes en bleu, les succès en vert, les avertissements en jaune et les erreurs en rouge. En cas d'échec, une trace claire est affichée (trap sur erreur).
 
 ## Désinstallation / suppression de la VM
 Pour supprimer la VM (exemple avec VMID 101):
