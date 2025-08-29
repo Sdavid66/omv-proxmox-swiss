@@ -16,7 +16,7 @@ Ce dépôt fournit un script shell à exécuter sur un nœud Proxmox pour créer
 
 ## One-liner d'installation
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swiss/main/setup-omv-on-proxmox-v2.sh)" -- \
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swiss/main/setup-omv-on-proxmox.sh)" -- \
   --name omv \
   --memory 4096 \
   --cores 2 \
