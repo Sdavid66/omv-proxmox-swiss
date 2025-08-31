@@ -18,7 +18,7 @@ Ce dépôt fournit un script shell à exécuter sur un nœud Proxmox pour créer
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swiss/main/setup-omv-on-proxmox.sh)" -- \
   --name omv \
-  --memory 4096 \
+  --memory 2048 \
   --cores 2 \
   --disk 32G \
   --bridge vmbr0 \
@@ -28,7 +28,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/sdavid66/omv-proxmox-swi
 
 Paramètres disponibles (tous optionnels):
 - `--name` Nom de la VM (défaut: `omv`)
-- `--memory` RAM en MiB (défaut: `4096`)
+- `--memory` RAM en MiB (défaut: `2048`)
 - `--cores` vCPU (défaut: `2`)
 - `--disk` Taille du disque système (défaut: `32G`)
 - `--bridge` Pont réseau Proxmox (défaut: `vmbr0`)
